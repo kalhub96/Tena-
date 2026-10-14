@@ -39,3 +39,10 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Android Studio / Gradle / IDE (never commit)
+.gradle/
+.idea/
+build/
+local.properties
+*.iml

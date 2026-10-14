@@ -1,23 +1,25 @@
 {
   "expo": {
-    "name": "Tena",
-    "slug": "Tena+",
-    "scheme": "tena",
+    "name": "Tena+",
+    "slug": "tena-plus",
+    "scheme": "tenaplus",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tenaplus.app"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#0f4c45",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.tenaplus.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
