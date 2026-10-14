@@ -85,7 +85,6 @@ export default function SplashScreen() {
               </svg>
             </div>
             <div>
-              <p className="text-white text-xs font-semibold">Government-Grade Security</p>
               <p className="text-teal-400/70 text-xs">256-bit encrypted · ISO 27001</p>
             </div>
           </div>
@@ -97,10 +96,6 @@ export default function SplashScreen() {
                 <line x1="8" y1="21" x2="16" y2="21" />
                 <line x1="12" y1="17" x2="12" y2="21" />
               </svg>
-            </div>
-            <div>
-              <p className="text-white text-xs font-semibold">Powered by Fayda Digital ID</p>
-              <p className="text-teal-400/70 text-xs">Ethiopian National ID Platform</p>
             </div>
           </div>
         </div>
