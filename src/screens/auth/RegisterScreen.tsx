@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Heart } from "lucide-react-native";
 
 function getStrength(pw: string) {
   let s = 0;
@@ -39,7 +40,7 @@ export default function RegisterScreen() {
           </TouchableOpacity>
           <View className="flex-row items-center gap-2">
             <View className="w-8 h-8 rounded-xl bg-teal-600 items-center justify-center">
-              <Text className="text-white text-xs font-bold">T+</Text>
+              <Text className="text-white text-xs font-bold"><Heart size={20} color="#ffff" fill="#ffff" /></Text>
             </View>
             <Text className="text-gray-900 font-extrabold text-base">Tena<Text className="text-teal-600">+</Text></Text>
           </View>

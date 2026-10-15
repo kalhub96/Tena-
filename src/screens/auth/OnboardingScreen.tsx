@@ -2,27 +2,28 @@ import { useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Hospital, CalendarRange, Siren } from "lucide-react-native";
 
 const { width } = Dimensions.get('window');
 
 const slides = [
   {
     gradient: ['#0f4c45', '#1e7a6e'] as const,
-    chip: '🏥  One Health Identity',
-    title: 'Your health records,\nalways with you',
-    body: 'Tena+ creates a unified digital health identity linked to your Fayda ID — accessible at every hospital, clinic, and pharmacy across Ethiopia.',
+    chip:'One Health Identity',
+    title: 'Your health records, always with you',
+    body: 'Tena+ creates a unified digital health identity linked to your Fayda ID \n accessible at every hospital, clinic, and pharmacy across Ethiopia.',
   },
   {
     gradient: ['#1a3a7a', '#2457c5'] as const,
-    chip: '📅  Book & Queue',
-    title: 'Appointments\nwithout the wait',
-    body: 'Reserve your slot at any hospital, pick your doctor and department, then check in with a QR code. Real-time queue updates keep you informed.',
+    chip: 'Book & Queue',
+    title: 'Appointments without the wait',
+    body: 'Reserve your slot at any hospital, pick your doctor and department\nthen check in with a QR code. Real-time queue updates keep you informed.',
   },
   {
     gradient: ['#7a1a1a', '#c54224'] as const,
-    chip: '🚨  Emergency Ready',
-    title: 'Help when every\nsecond counts',
-    body: 'One-tap SOS shares your location and health ID with responders instantly. Your critical health info is always available — even offline.',
+    chip: 'Emergency Ready',
+    title: 'Help when every second counts',
+    body: 'One-tap SOS shares your location and health ID with responders instantly. \nYour critical health info is always available even offline.',
   },
 ];
 
@@ -39,18 +40,21 @@ export default function OnboardingScreen() {
   const slide = slides[idx];
 
   return (
+    
     <View className="flex-1 bg-white">
       {/* Visual panel */}
-      <LinearGradient colors={slide.gradient} className="h-72 items-center justify-center rounded-b-3xl">
-        <Text className="text-8xl">
-          {idx === 0 ? '🏥' : idx === 1 ? '📅' : '🚨'}
+        <div className="flex items-center justify-center py-10">
+          <Text className="text-8xl">
+          {idx === 0 ? <Hospital size={80} color="#1e7a6e"/> : idx === 1 ? <CalendarRange color="#000000" /> : <Siren color="#000000" />}
         </Text>
-      </LinearGradient>
+        </div>
 
       {/* Content */}
-      <View className="flex-1 px-6 pt-8">
+      
+      <View className="flex-1 items-center  px-6 pt-8">
         {/* Chip */}
-        <View className="self-start bg-teal-50 rounded-full px-3 py-1 mb-4">
+        
+          <View className=" items-centerself-start bg-teal-50 rounded-full px-3 py-1 mb-6">
           <Text className="text-teal-700 text-xs font-semibold">{slide.chip}</Text>
         </View>
 
@@ -59,6 +63,7 @@ export default function OnboardingScreen() {
         </Text>
         <Text className="text-gray-500 text-sm leading-relaxed">{slide.body}</Text>
       </View>
+      
 
       {/* Bottom */}
       <View className="px-6 pb-10 gap-4">
@@ -67,20 +72,22 @@ export default function OnboardingScreen() {
           {slides.map((_, i) => (
             <View
               key={i}
-              className={`h-2 rounded-full ${i === idx ? 'w-6 bg-teal-600' : 'w-2 bg-gray-200'}`}
+              className={`h-1 rounded-full ${i === idx ? 'w-4 bg-teal-600' : 'w-2 bg-gray-200'}`}
             />
           ))}
         </View>
 
-        <TouchableOpacity
+        <div className="flex items-center justify-center">
+          <TouchableOpacity
           onPress={next}
-          className="bg-teal-600 rounded-xl py-4 items-center"
-          activeOpacity={0.85}
+          className="bg-teal-600 rounded-xl py-4 items-center w-80"
+          activeOpacity={0.25}
         >
           <Text className="text-white font-bold text-base">
             {idx === slides.length - 1 ? 'Get started' : 'Continue'}
           </Text>
         </TouchableOpacity>
+        </div>
 
         <TouchableOpacity onPress={() => router.replace('/login')} activeOpacity={0.7}>
           <Text className="text-teal-600 font-semibold text-sm text-center">
