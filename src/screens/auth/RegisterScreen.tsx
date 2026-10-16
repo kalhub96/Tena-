@@ -2,6 +2,27 @@ import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Heart, User, Mail, Phone, Lock, Eye, EyeOff } from "lucide-react-native";
+import { detectCarrier, isValidEthiopianMobile, normalizeEthiopianMobile } from '@/hooks/usephone';
+
+type Panel = 'phone';
+
+
+type FieldProps = {
+  label: string;
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+};
+
+const Field = ({ label, icon, children, className = '' }: FieldProps) => (
+  <View className={className}>
+    <Text className="text-gray-600 text-xs font-semibold mb-1">{label}</Text>
+    <View className="flex-row items-center border border-gray-200 rounded-xl px-3 bg-gray-50 gap-2">
+      {icon}
+      {children}
+    </View>
+  </View>
+);
 
 function getStrength(pw: string) {
   let s = 0;
@@ -18,9 +39,20 @@ export default function RegisterScreen() {
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', phone: '', password: '' });
   const [showPw, setShowPw] = useState(false);
   const strength = getStrength(form.password);
+  const [panel, setPanel] = useState<Panel>('phone');
+  const [phone, setPhone] = useState('');
+
+  const carrier = phone.length === 9 ? detectCarrier(phone) : null;
 
   const strengthColors = ['bg-gray-200', 'bg-red-400', 'bg-orange-400', 'bg-yellow-400', 'bg-green-500'];
   const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+
+  const handlePhoneChange = (v: string) => {
+    const normalized = normalizeEthiopianMobile(v);
+    setPhone(normalized);                              
+    setForm(f => ({ ...f, phone: normalized }));      
+    setError('');
+  };
 
   const handleSubmit = async () => {
     const { firstName, lastName, email, phone, password } = form;
@@ -46,16 +78,6 @@ export default function RegisterScreen() {
     router.push({ pathname: '/otp', params: { phone } });
   };
 
-  const Field = ({ label, icon, children, className = '' }: any) => (
-  <View className={`${className}`}>
-    <Text className="text-gray-600 text-xs font-semibold mb-1">{label}</Text>
-    <View className="flex-row items-center border border-gray-200 rounded-xl px-3 bg-gray-50 gap-2">
-      {icon}
-      {children}
-    </View>
-  </View>
-);
-
 return (
   <View className="flex-1 bg-white items-center">
     <View className="flex-1 w-full max-w-md px-6 pt-8 pb-6 justify-between">
@@ -70,11 +92,11 @@ return (
           </Text>
         </View>
 
-        {error && (
-          <div className="bg-red-700 border border-red-500 text-red-100 px-4 py-3 rounded-lg text-sm mb-4">
-            {error}
-          </div>
-        )}
+        {error ? (
+          <View className="bg-red-50 border border-red-300 px-4 py-3 rounded-lg">
+            <Text className="text-red-700 text-sm">{error}</Text>
+          </View>
+        ) : null}
 
         {/* Step bar */}
         <View className="flex-row gap-1.5">
@@ -90,12 +112,12 @@ return (
 
         {/* First + last name share one row */}
         <View className="flex-row gap-3">
-          <Field label="First name" icon={<User size={16} color="#000" />} className="flex-1">
+          <Field label="First name" className="flex-1">
             <TextInput className="flex-1 py-3 text-gray-900 text-sm" placeholder="Abebe"
               placeholderTextColor="#9ca3af" autoCapitalize="words" value={form.firstName}
               onChangeText={v => setForm(f => ({ ...f, firstName: v }))} />
           </Field>
-          <Field label="Last name" icon={<User size={16} color="#000" />} className="flex-1">
+          <Field label="Last name" className="flex-1">
             <TextInput className="flex-1 py-3 text-gray-900 text-sm" placeholder="Bekele"
               placeholderTextColor="#9ca3af" autoCapitalize="words" value={form.lastName}
               onChangeText={v => setForm(f => ({ ...f, lastName: v }))} />
@@ -109,9 +131,13 @@ return (
         </Field>
 
         <Field label="Phone" icon={<Phone size={16} color="#000" />}>
-          <TextInput className="flex-1 py-3 text-gray-900 text-sm" placeholder="+251 91 234 5678"
-            placeholderTextColor="#9ca3af" keyboardType="phone-pad"
-            value={form.phone} onChangeText={v => setForm(f => ({ ...f, phone: v }))} />
+          <TextInput 
+            className="flex-1 py-3 text-gray-900 text-sm" 
+            placeholder="+251 91 234 5678"
+            placeholderTextColor="#9ca3af" 
+            keyboardType="phone-pad"
+            value={form.phone} 
+            onChangeText={handlePhoneChange}/>
         </Field>
 
         <Field label="Password" icon={<Lock size={16} color="#000" />}>
