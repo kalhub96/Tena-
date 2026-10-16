@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Heart } from "lucide-react-native";
+import { Heart, User, Mail, Phone, Lock, Eye, EyeOff } from "lucide-react-native";
 
 function getStrength(pw: string) {
   let s = 0;
@@ -11,9 +11,10 @@ function getStrength(pw: string) {
   if (/[^A-Za-z0-9]/.test(pw)) s++;
   return s;
 }
-
 export default function RegisterScreen() {
   const router = useRouter();
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', phone: '', password: '' });
   const [showPw, setShowPw] = useState(false);
   const strength = getStrength(form.password);
@@ -21,98 +22,127 @@ export default function RegisterScreen() {
   const strengthColors = ['bg-gray-200', 'bg-red-400', 'bg-orange-400', 'bg-yellow-400', 'bg-green-500'];
   const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const { firstName, lastName, email, phone, password } = form;
-    if (!firstName || !lastName || !email || !phone || !password) {
-      Alert.alert('Please fill in all fields'); return;
+    setError("")
+
+    if (!firstName || !lastName || !email ||!phone || !password){
+        setError("Please fill in all fields")
+        return
     }
+
+    if(!email.includes("@")){
+        setError("Please enter a valid email")
+        return
+    }
+
+    if (password.length < 6) {
+        setError("Password must be at least 6 characters")
+        return
+    }
+
+    setLoading(true)
+
     router.push({ pathname: '/otp', params: { phone } });
   };
 
-  return (
-    <ScrollView className="flex-1 bg-white" contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-      <View className="flex-1 px-6 pt-16 pb-10">
+  const Field = ({ label, icon, children, className = '' }: any) => (
+  <View className={`${className}`}>
+    <Text className="text-gray-600 text-xs font-semibold mb-1">{label}</Text>
+    <View className="flex-row items-center border border-gray-200 rounded-xl px-3 bg-gray-50 gap-2">
+      {icon}
+      {children}
+    </View>
+  </View>
+);
 
-        {/* Back + brand */}
-        <View className="flex-row items-center gap-3 mb-6">
-          <TouchableOpacity onPress={() => router.back()} className="w-10 h-10 rounded-full bg-gray-100 items-center justify-center">
-            <Text className="text-gray-700 text-lg">←</Text>
-          </TouchableOpacity>
-          <View className="flex-row items-center gap-2">
-            <View className="w-8 h-8 rounded-xl bg-teal-600 items-center justify-center">
-              <Text className="text-white text-xs font-bold"><Heart size={20} color="#ffff" fill="#ffff" /></Text>
-            </View>
-            <Text className="text-gray-900 font-extrabold text-base">Tena<Text className="text-teal-600">+</Text></Text>
+return (
+  <View className="flex-1 bg-white items-center">
+    <View className="flex-1 w-full max-w-md px-6 pt-8 pb-6 justify-between">
+      <View className="gap-3">
+        {/* Brand */}
+        <View className="flex-row items-center gap-2">
+          <View className="w-8 h-8 rounded-xl bg-teal-600 items-center justify-center">
+            <Heart size={18} color="#fff" fill="#fff" />
           </View>
+          <Text className="text-gray-900 font-extrabold text-base">
+            Tena<Text className="text-teal-600">+</Text>
+          </Text>
         </View>
 
+        {error && (
+          <div className="bg-red-700 border border-red-500 text-red-100 px-4 py-3 rounded-lg text-sm mb-4">
+            {error}
+          </div>
+        )}
+
         {/* Step bar */}
-        <View className="flex-row gap-1.5 mb-6">
+        <View className="flex-row gap-1.5">
           <View className="flex-1 h-1 rounded-full bg-teal-600" />
           <View className="flex-1 h-1 rounded-full bg-gray-200" />
           <View className="flex-1 h-1 rounded-full bg-gray-200" />
         </View>
 
-        <Text className="text-2xl font-extrabold text-gray-900 mb-2">Create your account</Text>
-        <Text className="text-gray-500 text-sm mb-6">Join Ethiopia's national health platform.</Text>
-
-        {/* Fields */}
-        {[
-          { key: 'firstName', label: 'First name', placeholder: 'Abebe', icon: '👤', type: 'default' },
-          { key: 'lastName',  label: 'Last name',  placeholder: 'Bekele', icon: '👤', type: 'default' },
-          { key: 'email',     label: 'Email',      placeholder: 'abebe@example.com', icon: '✉️', type: 'email-address' },
-          { key: 'phone',     label: 'Phone',      placeholder: '+251 91 234 5678', icon: '📞', type: 'phone-pad' },
-        ].map(({ key, label, placeholder, icon, type }) => (
-          <View key={key} className="mb-4">
-            <Text className="text-gray-600 text-xs font-semibold mb-1.5">{label}</Text>
-            <View className="flex-row items-center border border-gray-200 rounded-xl px-4 bg-gray-50">
-              <Text className="text-gray-400 mr-2">{icon}</Text>
-              <TextInput
-                className="flex-1 py-3.5 text-gray-900 text-sm"
-                placeholder={placeholder}
-                placeholderTextColor="#9ca3af"
-                keyboardType={type as any}
-                autoCapitalize={key === 'email' ? 'none' : 'words'}
-                value={(form as any)[key]}
-                onChangeText={v => setForm(f => ({ ...f, [key]: v }))}
-              />
-            </View>
-          </View>
-        ))}
-
-        {/* Password */}
-        <Text className="text-gray-600 text-xs font-semibold mb-1.5">Password</Text>
-        <View className="flex-row items-center border border-gray-200 rounded-xl px-4 bg-gray-50 mb-2">
-          <Text className="text-gray-400 mr-2">🔒</Text>
-          <TextInput
-            className="flex-1 py-3.5 text-gray-900 text-sm"
-            placeholder="••••••••"
-            placeholderTextColor="#9ca3af"
-            secureTextEntry={!showPw}
-            value={form.password}
-            onChangeText={v => setForm(f => ({ ...f, password: v }))}
-          />
-          <TouchableOpacity onPress={() => setShowPw(!showPw)}>
-            <Text className="text-gray-400">{showPw ? '🙈' : '👁'}</Text>
-          </TouchableOpacity>
+        <View>
+          <Text className="text-2xl font-extrabold text-gray-900">Create your account</Text>
+          <Text className="text-gray-500 text-sm">Join Ethiopia's national health platform.</Text>
         </View>
 
-        {/* Strength bar */}
-        {form.password.length > 0 && (
-          <View className="mb-5">
-            <View className="flex-row gap-1 mb-1">
-              {[1,2,3,4].map(i => (
-                <View key={i} className={`flex-1 h-1 rounded-full ${i <= strength ? strengthColors[strength] : 'bg-gray-200'}`} />
-              ))}
-            </View>
-            <Text className="text-xs text-gray-400">{strengthLabels[strength]}</Text>
-          </View>
-        )}
+        {/* First + last name share one row */}
+        <View className="flex-row gap-3">
+          <Field label="First name" icon={<User size={16} color="#000" />} className="flex-1">
+            <TextInput className="flex-1 py-3 text-gray-900 text-sm" placeholder="Abebe"
+              placeholderTextColor="#9ca3af" autoCapitalize="words" value={form.firstName}
+              onChangeText={v => setForm(f => ({ ...f, firstName: v }))} />
+          </Field>
+          <Field label="Last name" icon={<User size={16} color="#000" />} className="flex-1">
+            <TextInput className="flex-1 py-3 text-gray-900 text-sm" placeholder="Bekele"
+              placeholderTextColor="#9ca3af" autoCapitalize="words" value={form.lastName}
+              onChangeText={v => setForm(f => ({ ...f, lastName: v }))} />
+          </Field>
+        </View>
 
-        <TouchableOpacity onPress={handleSubmit} className="bg-teal-600 rounded-xl py-4 items-center mb-6" activeOpacity={0.85}>
+        <Field label="Email" icon={<Mail size={16} color="#000" />}>
+          <TextInput className="flex-1 py-3 text-gray-900 text-sm" placeholder="abebe@example.com"
+            placeholderTextColor="#9ca3af" keyboardType="email-address" autoCapitalize="none"
+            value={form.email} onChangeText={v => setForm(f => ({ ...f, email: v }))} />
+        </Field>
+
+        <Field label="Phone" icon={<Phone size={16} color="#000" />}>
+          <TextInput className="flex-1 py-3 text-gray-900 text-sm" placeholder="+251 91 234 5678"
+            placeholderTextColor="#9ca3af" keyboardType="phone-pad"
+            value={form.phone} onChangeText={v => setForm(f => ({ ...f, phone: v }))} />
+        </Field>
+
+        <Field label="Password" icon={<Lock size={16} color="#000" />}>
+          <TextInput className="flex-1 py-3 text-gray-900 text-sm" placeholder="••••••••"
+            placeholderTextColor="#9ca3af" secureTextEntry={!showPw}
+            value={form.password} onChangeText={v => setForm(f => ({ ...f, password: v }))} />
+          <TouchableOpacity onPress={() => setShowPw(!showPw)}>
+            {showPw ? <EyeOff size={16} color="#000" /> : <Eye size={16} color="#000" />}
+          </TouchableOpacity>
+        </Field>
+
+        {/* Fixed height so the strength bar appearing doesn't shift the layout */}
+        <View className="h-6">
+          {form.password.length > 0 && (
+            <>
+              <View className="flex-row gap-1 mb-1">
+                {[1, 2, 3, 4].map(i => (
+                  <View key={i} className={`flex-1 h-1 rounded-full ${i <= strength ? strengthColors[strength] : 'bg-gray-200'}`} />
+                ))}
+              </View>
+              <Text className="text-xs text-gray-400">{strengthLabels[strength]}</Text>
+            </>
+          )}
+        </View>
+      </View>
+
+      {/* Bottom pinned */}
+      <View className="gap-3">
+        <TouchableOpacity onPress={handleSubmit} className="bg-teal-600 rounded-xl py-3.5 items-center" activeOpacity={0.85}>
           <Text className="text-white font-bold text-base">Create account</Text>
         </TouchableOpacity>
-
         <View className="flex-row justify-center gap-1">
           <Text className="text-gray-500 text-sm">Already have an account?</Text>
           <TouchableOpacity onPress={() => router.push('/login')}>
@@ -120,6 +150,7 @@ export default function RegisterScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </ScrollView>
-  );
+    </View>
+  </View>
+);
 }

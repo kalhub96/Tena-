@@ -23,7 +23,7 @@ const slides = [
     gradient: ['#7a1a1a', '#c54224'] as const,
     chip: 'Emergency Ready',
     title: 'Help when every second counts',
-    body: 'One-tap SOS shares your location and health ID with responders instantly. \nYour critical health info is always available even offline.',
+    body: 'One-tap SOS shares your location and health ID with responders instantly. \nYour critical health info is always available —even offline.',
   },
 ];
 
@@ -45,7 +45,7 @@ export default function OnboardingScreen() {
       {/* Visual panel */}
         <div className="flex items-center justify-center py-10">
           <Text className="text-8xl">
-          {idx === 0 ? <Hospital size={80} color="#1e7a6e"/> : idx === 1 ? <CalendarRange color="#000000" /> : <Siren color="#000000" />}
+          {idx === 0 ? <Hospital size={80} color="#1e7a6e"/> : idx === 1 ? <CalendarRange size={80} color="#1e7a6e" /> : <Siren size={80} color="#1e7a6e" />}
         </Text>
         </div>
 
