@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   ScrollView,
   View,
@@ -12,10 +12,17 @@ import {
   TouchableOpacity,
   type StyleProp,
   type ViewStyle,
+  type NativeSyntheticEvent,
+  type NativeScrollEvent,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Heart, ChevronRight, ShieldCheck, Hospital, Stethoscope, Pill, Scale, TvMinimalPlay, Ambulance } from 'lucide-react-native';
+import { Heart, ChevronRight, ShieldCheck, Hospital, Stethoscope, Pill, Scale, TvMinimalPlay, Ambulance, QrCode } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import TrustBadges from '@/components/modals/TrustBadges';
+import FeatureCard from '@/components/cards/queueCard';
+import { FEATURES } from '@/api/features';
+import HowItWorks from '@/components/modals/HowItWorks';
 
 const NAV = ['Features', 'How It Works', 'Benefits', 'Security'];
 
@@ -246,11 +253,90 @@ function Orbit({ size }: { size: number }) {
   );
 }
 
+function StickyBar({ visible, wide }: { visible: boolean; wide: boolean }) {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const anim = useRef(new Animated.Value(0)).current; // 0 = hidden, 1 = shown
+
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: visible ? 1 : 0,
+      duration: 250,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [visible, anim]);
+
+  return (
+    <Animated.View
+      pointerEvents={visible ? 'auto' : 'none'}
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        opacity: anim,
+        transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [-72, 0] }) }],
+        backgroundColor: 'rgba(10,61,55,0.92)',
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255,255,255,0.12)',
+        paddingTop: insets.top,
+        ...(Platform.OS === 'web' ? ({ backdropFilter: 'blur(12px)' } as any) : {}),
+      }}
+    >
+      <View
+        className="w-full self-center flex-row items-center justify-between px-6 py-3"
+        style={{ maxWidth: 1200 }}
+      >
+        <View className="flex-row items-center gap-3">
+          <View className="w-8 h-8 rounded-full bg-white/15 items-center justify-center">
+            <Heart size={16} color="#fff" fill="#fff" />
+          </View>
+          <Text className="text-white font-bold text-base">Tena+</Text>
+        </View>
+
+        {wide && (
+          <View className="flex-row gap-8">
+            {NAV.map((l) => (
+              <TouchableOpacity key={l} /* TODO: scroll to section */>
+                <Text className="text-white/80 text-sm font-medium">{l}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        <View className="flex-row items-center gap-4">
+          <TouchableOpacity onPress={() => router.push('/login')}>
+            <Text className="text-teal-200 text-sm font-semibold">Sign In</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push('/register')}
+            className="flex-row items-center gap-1 bg-teal-400 rounded-xl px-4 py-2"
+            activeOpacity={0.85}
+          >
+            <Text className="text-white font-bold text-sm">Get Started</Text>
+            <ChevronRight size={16} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Animated.View>
+  );
+}
+
 export default function LandingScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const wide = width >= 900;
   const orbitSize = wide ? 460 : Math.min(width - 48, 360);
+  const cols = wide ? 4 : width >= 640 ? 2 : 1;
+
+  // show the sticky bar once the user scrolls past the top nav
+  const [showBar, setShowBar] = useState(false);
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const past = e.nativeEvent.contentOffset.y > 120;
+    setShowBar((prev) => (prev === past ? prev : past));
+  };
 
   return (
     <LinearGradient colors={['#0a3d37', '#0f4c45', '#1e7a6e']} locations={[0, 0.45, 1]} style={{ flex: 1 }}>
@@ -260,7 +346,7 @@ export default function LandingScreen() {
         <View style={{ width: 210, height: 70, backgroundColor: '#fff', borderRadius: 14, top: -140 }} />
       </View>
 
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} onScroll={onScroll} scrollEventThrottle={16}>
         <View className="w-full self-center px-6 pb-16" style={{ maxWidth: 1200 }}>
           {/* Nav */}
           <View className="flex-row items-center justify-between py-5">
@@ -314,7 +400,7 @@ export default function LandingScreen() {
               </Text>
 
               <Text className="text-teal-100/90 text-lg" style={{ maxWidth: 480 }}>
-                Seamless, secure healthcare for every Ethiopian — from Addis Ababa to the most remote kebele.
+                Seamless, secure healthcare for every Ethiopian from Addis Ababa to the most remote kebele.
               </Text>
               <Text className="text-teal-200/80 text-sm">ለሁሉም ኢትዮጵያውያን ሁሉን አቀፍ ዲጂታል የጤና አገልግሎት</Text>
 
@@ -341,6 +427,48 @@ export default function LandingScreen() {
               <Orbit size={orbitSize} />
             </View>
           </View>
+        </View>
+        <View className="bg-gray-50 py-5 ">
+          <View className="w-full self-center px-6 "
+          style={{ maxWidth: 1200 }}>
+            <TrustBadges />
+          </View>
+        </View>
+        <View className="bg-white w-full flex items-center justify-center py-20">
+          <Text className="text-teal-600  font-semibold text-xl mb-8">PLATFORM FEATURES</Text>
+          <Text className="font-bold text-4xl mb-2">Everything in one app</Text>
+          <Text className="text-teal-600 mb-8">ሁሉም በአንድ መተግበሪያ</Text>
+          <Text className="text-gray-600 mb-10">Tena+ unifies the complete care journey from verification to prescription pickup.</Text>
+          <View className="w-full self-center flex-row flex-wrap px-6" style={{ maxWidth: 1200 }}>
+            {FEATURES.map((f) => (
+              <View key={f.title} style={{ width: `${100 / cols}%`, padding: 8 }}>
+                <FeatureCard {...f} />
+               </View>
+            ))}
+          </View>
+        </View>
+        <View className="bg-gray-50 w-full flex items-center justify-center py-20">
+          <Text className="text-teal-600 font-semibold text-lg mb-8">How It Works</Text>
+          <Text className="text-black font-bold text-4xl mb-3">5 steps to complete care</Text>
+          <Text className="text-teal-600 font-semibold text-sm mb-8">ሙሉ ሕክምና በ5 ደረጃዎች</Text>
+          <Text className="text-gray-500 text-sm mb-8">From first tap to full health coverage in under 3 minutes if you have a Fayda National ID.</Text>
+          <View className="mb-9">
+          <HowItWorks/>
+          </View>
+          <TouchableOpacity
+            onPress={() => router.push('/fayda')}
+            className="flex-row items-center gap-4 bg-teal-400 rounded-2xl px-4 py-4"
+            activeOpacity={0.85}
+          >
+            <Text className="text-white font-bold text-lg">Start Your Journey</Text>
+            <ChevronRight size={16} color="#fff" />
+          </TouchableOpacity>
+        </View>
+        <View className="bg-white w-full flex items-center justify-center py-20">
+          <Text className="text-teal-600  font-semibold text-xl mb-8">Built for Everyone</Text>
+          <Text className="font-bold text-4xl mb-2">Benefits for every stakeholder</Text>
+          <Text className="text-teal-600 mb-8">ለሁሉም ባለድርሻ ጥቅም</Text>
+          <Text className="text-gray-600 mb-10">Tena+ serves patients, providers, and government with a single integrated platform.</Text>
         </View>
       </ScrollView>
     </LinearGradient>
