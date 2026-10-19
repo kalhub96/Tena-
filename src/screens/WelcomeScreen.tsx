@@ -17,12 +17,18 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Heart, ChevronRight, ShieldCheck, Hospital, Stethoscope, Pill, Scale, TvMinimalPlay, Ambulance, QrCode } from 'lucide-react-native';
+import { Heart, ChevronRight, ShieldCheck, Hospital, Stethoscope, Pill, Scale, TvMinimalPlay, Ambulance, QrCode, Shield } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import TrustBadges from '@/components/modals/TrustBadges';
 import FeatureCard from '@/components/cards/queueCard';
+import AudienceCards from '@/components/AudienceCards';
 import { FEATURES } from '@/api/features';
 import HowItWorks from '@/components/modals/HowItWorks';
+import SecuritySection from '@/components/SecuritySection';
+import OfflineSection from '@/components/OfflineSection';
+import CtaSection from '@/components/CtaSection';
+import Footer from '@/components/Footer';
+
 
 const NAV = ['Features', 'How It Works', 'Benefits', 'Security'];
 
@@ -469,7 +475,12 @@ export default function LandingScreen() {
           <Text className="font-bold text-4xl mb-2">Benefits for every stakeholder</Text>
           <Text className="text-teal-600 mb-8">ለሁሉም ባለድርሻ ጥቅም</Text>
           <Text className="text-gray-600 mb-10">Tena+ serves patients, providers, and government with a single integrated platform.</Text>
+          <AudienceCards />
         </View>
+          <SecuritySection />
+          <OfflineSection />
+          <CtaSection />
+          <Footer />
       </ScrollView>
     </LinearGradient>
   );
