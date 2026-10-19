@@ -43,11 +43,11 @@ export default function OnboardingScreen() {
     
     <View className="flex-1 bg-white">
       {/* Visual panel */}
-        <div className="flex items-center justify-center py-10">
+        <View className="flex items-center justify-center py-10">
           <Text className="text-8xl">
           {idx === 0 ? <Hospital size={80} color="#1e7a6e"/> : idx === 1 ? <CalendarRange size={80} color="#1e7a6e" /> : <Siren size={80} color="#1e7a6e" />}
         </Text>
-        </div>
+        </View>
 
       {/* Content */}
       
@@ -77,7 +77,7 @@ export default function OnboardingScreen() {
           ))}
         </View>
 
-        <div className="flex items-center justify-center">
+        <View className="flex items-center justify-center">
           <TouchableOpacity
           onPress={next}
           className="bg-teal-600 rounded-xl py-4 items-center w-80"
@@ -87,7 +87,7 @@ export default function OnboardingScreen() {
             {idx === slides.length - 1 ? 'Get started' : 'Continue'}
           </Text>
         </TouchableOpacity>
-        </div>
+        </View>
 
         <TouchableOpacity onPress={() => router.replace('/login')} activeOpacity={0.7}>
           <Text className="text-teal-600 font-semibold text-sm text-center">
