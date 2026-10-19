@@ -1,1 +1,1 @@
-export { default } from "../screens/auth/WelcomeScreen";
+export { default } from "../screens/WelcomeScreen";
