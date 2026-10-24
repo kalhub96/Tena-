@@ -29,7 +29,7 @@ const APPOINTMENT = {
 };
 
 const ACTIONS: {label: string; Icon:LucideIcon; bg: string; color: string; href?: string }[] = [
-    { label: 'Book', Icon:  CalendarDays, bg: '#dbeafe', color: '#2563eb', href: '/appointments'},
+    { label: 'Book', Icon:  CalendarDays, bg: '#dbeafe', color: '#2563eb', href: '/appointment'},
     { label: 'Queue', Icon: Users, bg: '#ccfbf1', color: '#0d9488' },
     { label: 'Video', Icon: Video, bg: '#f3e8ff', color: '#9333ea' },
     { label: 'SOS', Icon: CircleAlert, bg: '#fee2e2', color: '#dc2626' },
